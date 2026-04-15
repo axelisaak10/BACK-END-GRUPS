@@ -1,4 +1,4 @@
 {
-  "buildCommand": "nest build",
+  "buildCommand": "npm run build",
   "outputDirectory": "dist"
 }
