@@ -17,13 +17,20 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: any) => {
+          const authHeader = request?.headers?.authorization;
+          const cookies = request?.headers?.cookie;
+          
+          console.log(`[AUTH-DEBUG] Incoming Request: ${request.method} ${request.url}`);
+          console.log(`[AUTH-DEBUG] Authorization Header: ${authHeader ? 'Bearer ' + authHeader.substring(7, 15) + '...' : 'MISSING'}`);
+          console.log(`[AUTH-DEBUG] Cookies Header: ${cookies ? 'PRESENT' : 'MISSING'}`);
+
           // Intentar leer de cookie primero
           const fromCookie = request?.cookies?.Authentication || null;
           if (fromCookie) {
+            console.log('[AUTH-DEBUG] Found Authentication cookie');
             return fromCookie;
           }
-          // Luego intentar del header Authorization
-          const authHeader = request?.headers?.authorization;
+          
           if (authHeader && authHeader.startsWith('Bearer ')) {
             return authHeader.substring(7);
           }
@@ -31,7 +38,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         },
       ]),
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('JWT_SECRET') || 'default-secret',
+      secretOrKey: (() => {
+        const secret = configService.get<string>('JWT_SECRET');
+        console.log(`[AUTH-DEBUG] Grups Secret loaded: ${secret ? 'YES (starts with ' + secret.substring(0, 3) + ')' : 'NO (using fallback)'}`);
+        return secret || 'super-secret-jwt-key';
+      })(),
     });
   }
 
