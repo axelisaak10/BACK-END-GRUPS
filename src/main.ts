@@ -15,7 +15,7 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    origin: ['https://apigatway.onrender.com'],
+    origin: ['https://apigatwey-seguridad.onrender.com'],
     credentials: true,
   });
 
